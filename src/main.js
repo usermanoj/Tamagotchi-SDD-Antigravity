@@ -32,28 +32,31 @@ if (window.location.search.includes('demo=1')) {
   game.reset(); // clear any neglected history
   game.stop();  // freeze natural decay to control the script
 
-  // Frame 1: Normal State (wait 2 seconds)
+  // Frame 1: Normal State (waits 4 seconds)
   setTimeout(() => {
     // Frame 2: Sudden Sickness from Neglect
+    console.log('DEMO: Triggering Sick state...');
     game.stats = { hunger: 0, happiness: 0, energy: 0 };
     game.tick(); // Apply state
-  }, 2000);
+  }, 4000);
 
-  // Frame 3: Healing
+  // Frame 3: Healing (begins after 8s total)
   setTimeout(() => {
+    console.log('DEMO: Healing ChuChu...');
     document.querySelector('.action-btn.feed')?.click();
     document.querySelector('.action-btn.play')?.click();
-  }, 5000);
+  }, 8000);
   setTimeout(() => {
     document.querySelector('.action-btn.rest')?.click();
     game.stats = { hunger: 100, happiness: 100, energy: 100 };
-    game.tick(); // Fully healed
-  }, 6000);
+    game.tick(); // Fully healed back to Normal
+  }, 10000);
 
-  // Frame 4: Evolution 
+  // Frame 4: Evolution (triggers at 13s total)
   setTimeout(() => {
+    console.log('DEMO: Triggering Evolution animation...');
     game.triggerEvolution('normal', 'evolved');
-  }, 8000);
+  }, 13000);
 
   // Frame 5: Post-Evolution Interactivity
   setTimeout(() => {

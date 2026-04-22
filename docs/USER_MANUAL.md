@@ -87,7 +87,7 @@
 
 ### 🎮 What is ChuChu?
 
-ChuChu is your tiny virtual puppy — a modern take on the classic Tamagotchi! Your job is to keep ChuChu fed, happy, and energized. If you take good care of ChuChu for 3 minutes, your puppy will evolve into a magnificent Evolved Puppy with golden fur and sparkles! ✨
+ChuChu is your tiny virtual puppy — a modern take on the classic Tamagotchi! Your job is to keep ChuChu fed, happy, and energized. If you take good care of ChuChu for **1 minute** (60 seconds), your puppy will evolve into a magnificent Evolved Puppy with golden fur and sparkles! ✨
 
 ---
 
@@ -109,9 +109,9 @@ ChuChu is your tiny virtual puppy — a modern take on the classic Tamagotchi! Y
 #### Stat Bars
 | Stat | Icon | What it means | Decay rate |
 |---|---|---|---|
-| **Hunger** | 🍖 | How full ChuChu is | -1 per 10 seconds |
-| **Happiness** | 😊 | How happy ChuChu feels | -1 per 10 seconds |
-| **Energy** | ⚡ | How energized ChuChu is | -1 per 10 seconds |
+| **Hunger** | 🍖 | How full ChuChu is | -2 per 1 second |
+| **Happiness** | 😊 | How happy ChuChu feels | -2 per 1 second |
+| **Energy** | ⚡ | How energized ChuChu is | -2 per 1 second |
 
 - **Green bar** = stat is above 60 (healthy)
 - **Orange bar** = stat is between 30-60 (warning)
@@ -138,15 +138,15 @@ ChuChu is your tiny virtual puppy — a modern take on the classic Tamagotchi! Y
 
 #### 1. 🟢 NORMAL State
 - **When:** All stats are above 0
-- **What happens:** Stats decay at normal speed (1 point per 10 seconds)
+- **What happens:** Stats decay at normal speed (2 points per 1 second)
 - **Actions:** Full effectiveness (Feed = +20 hunger, etc.)
 - **ChuChu looks:** Happy, breathing gently, tail wagging, eyes moving
 
 #### 2. 🔴 SICK State
 - **When:** Any stat drops to **0**
 - **What happens:**
-  - Stats decay at **2× speed** (2 points per 10 seconds!)
-  - Actions work at **50% effectiveness** (Feed = only +10 hunger)
+  - Stats decay at **2× speed** (4 points per 1 second!)
+  - Actions work at **80% effectiveness** (Feed = +16 hunger)
   - A 🌡️ thermometer appears next to ChuChu
   - ChuChu's colors shift to a sickly green tint
   - ChuChu wobbles weakly
@@ -163,7 +163,7 @@ ChuChu is your tiny virtual puppy — a modern take on the classic Tamagotchi! Y
 > Don't let ChuChu stay Sick too long! The 2× decay rate means stats spiral downward fast. Act quickly with Feed, Play, and Rest to recover.
 
 #### 3. 🟡 EVOLVED State (Evolution Event)
-- **When:** Active time reaches **3 minutes** AND care quality ≥ **50%** AND currently Normal
+- **When:** Active time reaches **1 minute** AND care quality ≥ **50%** AND currently Normal
 - **What happens:**
   - A 10-second evolution animation plays
   - ChuChu glows brightly with golden light
@@ -180,7 +180,7 @@ ChuChu is your tiny virtual puppy — a modern take on the classic Tamagotchi! Y
 ### 🌟 Evolution Guide
 
 #### Requirements to Evolve
-1. **Active Time ≥ 3 minutes** — You must have the tab open and focused for at least 3 minutes total
+1. **Active Time ≥ 1 minute** — You must have the tab open and focused for at least 60 seconds total
 2. **Care Quality ≥ 50%** — Your rolling average of stat management must be decent
 3. **Normal State** — ChuChu cannot evolve while Sick
 
@@ -195,7 +195,7 @@ ChuChu is your tiny virtual puppy — a modern take on the classic Tamagotchi! Y
 2. **Every 10 seconds**: Stats drop by 1 each
 3. **Rotate actions**: Feed → Play → Rest → Feed → Play → Rest...
 4. **Watch the footer**: Active time counts up, care quality should stay above 50%
-5. **At 3:00**: If quality ≥ 50%, evolution triggers automatically! 🎉
+5. **At 1:00**: If quality ≥ 50%, evolution triggers automatically! 🎉
 
 #### Visual Changes After Evolution
 | Feature | Baby ChuChu 🐶 | Evolved Puppy 🌟 |
@@ -335,7 +335,7 @@ location.reload();
 | **Start fresh** | 🔄 Reset → Yes, Reset |
 | **Prevent Sick** | Keep all stats above 0 |
 | **Recover from Sick** | Feed + Play + Rest until all stats > 20 |
-| **Trigger evolution** | Play 3+ minutes with care quality ≥ 50% |
+| **Trigger evolution** | Play 1+ minute with care quality ≥ 50% |
 | **Nose boop** | Click ChuChu's nose |
 | **Dizzy spin** | Click ChuChu 10× in 3 seconds |
 | **Idle dance** | Wait 60s idle, all stats > 60 |
