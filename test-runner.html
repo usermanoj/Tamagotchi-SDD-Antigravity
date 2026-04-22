@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ChuChu — Test Runner</title>
+  <style>
+    body { font-family: monospace; background: #1e1e1e; color: #d4d4d4; padding: 20px; }
+    h1 { color: #FFD54F; }
+    .pass { color: #4CAF50; }
+    .fail { color: #F44336; }
+    .section { color: #81C784; font-weight: bold; margin-top: 16px; }
+    #results { white-space: pre-wrap; line-height: 1.6; }
+    .summary { font-size: 18px; margin-top: 20px; padding: 12px; border-radius: 8px; }
+    .summary.allpass { background: #1B5E20; color: #A5D6A7; }
+    .summary.hasfail { background: #B71C1C; color: #EF9A9A; }
+  </style>
+</head>
+<body>
+  <h1>🧪 ChuChu Tamagotchi — Test Suite</h1>
+  <p>Automated tests validating spec-to-code fidelity.</p>
+  <div id="results">Loading tests...</div>
+
+  <!-- Load app modules first (we need the engine) -->
+  <script type="module">
+    import { CONFIG } from '/config.js';
+    import { StateMachine, STATES } from '/engine/state-machine.js';
+    import { EvolutionTracker, STAGES, STAGE_INFO } from '/engine/evolution.js';
+    import { Persistence } from '/engine/persistence.js';
+
+    const resultsEl = document.getElementById('results');
+    let output = '';
+    let passed = 0;
+    let failed = 0;
+
+    function log(text, cls = '') {
+      output += cls ? `<span class="${cls}">${text}</span>\n` : `${text}\n`;
+    }
+
+    function assert(condition, testId, description) {
+      if (condition) {
+        passed++;
+        log(`  ✅ ${testId}: ${description}`, 'pass');
+      } else {
+        failed++;
+        log(`  ❌ ${testId}: ${description}`, 'fail');
+      }
+    }
+
+    function assertEq(actual, expected, testId, description) {
+      assert(actual === expected, testId, `${description} (expected ${expected}, got ${actual})`);
+    }
+
+    function section(name) {
+      log(`\n━━━ ${name} ━━━`, 'section');
+    }
+
+    // ═══ State Machine Tests ═══
+    section('State Machine (REQ-DS)');
+    const sm = new StateMachine();
+
+    assertEq(sm.getDecayMultiplier('normal'), 1, 'T-DS-001', 'Normal decay multiplier');
+    assertEq(sm.getDecayMultiplier('sick'), 2, 'T-DS-002', 'Sick decay multiplier');
+    assertEq(sm.getDecayMultiplier('evolved'), 1, 'T-DS-003', 'Evolved decay multiplier');
+    assertEq(sm.getActionMultiplier('normal'), 1, 'T-DS-004', 'Normal action multiplier');
+    assertEq(sm.getActionMultiplier('sick'), 0.8, 'T-DS-005', 'Sick action multiplier');
+    assertEq(sm.getActionMultiplier('evolved'), 1, 'T-DS-006', 'Evolved action multiplier');
+    assertEq(sm.canAct('normal'), true, 'T-DS-007', 'canAct Normal');
+    assertEq(sm.canAct('sick'), true, 'T-DS-008', 'canAct Sick');
+    assertEq(sm.canAct('evolved'), true, 'T-DS-009', 'canAct Evolved');
+
+    assertEq(sm.evaluate({hunger:0, happiness:50, energy:50}, 'normal', false), 'sick',
+      'T-DS-010', 'Hunger=0 → Sick');
+    assertEq(sm.evaluate({hunger:50, happiness:0, energy:50}, 'normal', false), 'sick',
+      'T-DS-011', 'Happiness=0 → Sick');
+    assertEq(sm.evaluate({hunger:50, happiness:50, energy:0}, 'normal', false), 'sick',
+      'T-DS-012', 'Energy=0 → Sick');
+    assertEq(sm.evaluate({hunger:25, happiness:15, energy:30}, 'sick', false), 'sick',
+      'T-DS-013', 'Stay Sick when not all > 20');
+    assertEq(sm.evaluate({hunger:25, happiness:25, energy:25}, 'sick', false), 'normal',
+      'T-DS-014', 'Recovery: all > 20 → Normal');
+    assertEq(sm.evaluate({hunger:20, happiness:25, energy:25}, 'sick', false), 'sick',
+      'T-DS-015', 'No recovery when stat = 20 (needs > 20)');
+    assertEq(sm.evaluate({hunger:80, happiness:80, energy:80}, 'normal', false), 'normal',
+      'T-DS-016', 'Healthy stats → Normal');
+    assertEq(sm.evaluate({hunger:0, happiness:0, energy:0}, 'sick', true), 'evolved',
+      'T-DS-017', 'isEvolving overrides Sick → Evolved');
+    assertEq(sm.evaluate({hunger:0, happiness:0, energy:0}, 'normal', false), 'sick',
+      'T-DS-018', 'All stats 0 → Sick');
+
+    // ═══ Evolution Tracker Tests ═══
+    section('Evolution Tracker (REQ-EV)');
+
+    const et1 = new EvolutionTracker();
+    assertEq(et1.stage, 'baby', 'T-EV-001', 'Initial stage is baby');
+    assertEq(et1.getCareQuality(), CONFIG.STAT_INITIAL, 'T-EV-002', 'Default care quality');
+
+    et1.sampleCareQuality({hunger:60, happiness:60, energy:60});
+    assertEq(et1.getCareQuality(), 60, 'T-EV-003', 'Quality after 60/60/60 sample');
+
+    const et2 = new EvolutionTracker();
+    et2.sampleCareQuality({hunger:100, happiness:100, energy:100});
+    et2.sampleCareQuality({hunger:0, happiness:0, energy:0});
+    assertEq(et2.getCareQuality(), 50, 'T-EV-004', 'Rolling avg of [100, 0]');
+
+    const et3 = new EvolutionTracker();
+    for (let i = 0; i < 25; i++) et3.sampleCareQuality({hunger:50, happiness:50, energy:50});
+    assertEq(et3.careHistory.length, CONFIG.CARE_HISTORY_SIZE, 'T-EV-005',
+      `Buffer caps at ${CONFIG.CARE_HISTORY_SIZE}`);
+
+    const et4 = new EvolutionTracker();
+    et4.activeTime = 30; et4._visibleSince = null;
+    et4.sampleCareQuality({hunger:80, happiness:80, energy:80});
+    assertEq(et4.checkEvolution('normal'), null, 'T-EV-006', 'No evolve: time < 60s');
+
+    const et5 = new EvolutionTracker();
+    et5.activeTime = 200; et5._visibleSince = null;
+    et5.careHistory = [30, 30, 30]; et5.careQuality = 30;
+    assertEq(et5.checkEvolution('normal'), null, 'T-EV-007', 'No evolve: quality < 50');
+
+    const et6 = new EvolutionTracker();
+    et6.activeTime = 70; et6._visibleSince = null;
+    et6.careHistory = [80, 80, 80]; et6.careQuality = 80;
+    assertEq(et6.checkEvolution('normal'), 'evolved', 'T-EV-008', 'Evolve: time+quality met');
+
+    et6.stage = 'evolved';
+    assertEq(et6.checkEvolution('normal'), null, 'T-EV-009', 'Already evolved → null');
+
+    const et7 = new EvolutionTracker();
+    et7.activeTime = 200; et7._visibleSince = null;
+    et7.careHistory = [80]; et7.careQuality = 80;
+    assertEq(et7.checkEvolution('sick'), null, 'T-EV-010', 'No evolve during Sick');
+
+    const et8 = new EvolutionTracker();
+    et8.stage = 'evolved'; et8.activeTime = 250;
+    et8.careHistory = [80, 75, 70]; et8.careQuality = 75;
+    const s8 = et8.serialize();
+    const et9 = new EvolutionTracker();
+    et9.deserialize(s8);
+    assertEq(et9.stage, 'evolved', 'T-EV-011a', 'Serialize roundtrip: stage');
+    assertEq(et9.activeTime, 250, 'T-EV-011b', 'Serialize roundtrip: activeTime');
+    assertEq(et9.careHistory.length, 3, 'T-EV-011c', 'Serialize roundtrip: careHistory');
+
+    // ═══ Stage Info Tests ═══
+    section('Stage Info');
+    assertEq(STAGE_INFO.baby.name, 'Baby Puppy', 'T-SI-001', 'Baby stage name');
+    assertEq(STAGE_INFO.evolved.name, 'Evolved Puppy', 'T-SI-002', 'Evolved stage name');
+    assertEq(STAGE_INFO.baby.emoji, '🐶', 'T-SI-003', 'Baby emoji');
+    assertEq(STAGE_INFO.evolved.emoji, '🌟', 'T-SI-004', 'Evolved emoji');
+    assert(Object.keys(STAGE_INFO).length === 2, 'T-SI-005', 'Exactly 2 stages (baby, evolved)');
+    assert(Object.keys(STAGES).length === 2, 'T-SI-006', 'Exactly 2 stage constants');
+
+    // ═══ Persistence Tests ═══
+    section('Persistence (REQ-PE)');
+    const p = new Persistence();
+
+    assertEq(p.calculateOfflineDecay(30), 60, 'T-PE-001', 'Decay 30s = 60 points');
+    assertEq(p.calculateOfflineDecay(300), 100, 'T-PE-002', 'Decay 300s = 100 ticks capped');
+    assertEq(p.calculateOfflineDecay(99999), CONFIG.OFFLINE_DECAY_CAP, 'T-PE-003',
+      `Decay capped at ${CONFIG.OFFLINE_DECAY_CAP}`);
+    assertEq(p.getWelcomeMessage(30, false), null, 'T-PE-004', 'No message < 60s');
+    assert(p.getWelcomeMessage(120, false).includes('barely'), 'T-PE-005', '2min healthy msg');
+    assert(p.getWelcomeMessage(120, true).includes("don't feel"), 'T-PE-006', '2min sick msg');
+    assert(p.getWelcomeMessage(600, false).includes('missed'), 'T-PE-007', '10min healthy msg');
+    assert(p.getWelcomeMessage(3600, false).includes('FOREVER'), 'T-PE-008', '60min healthy msg');
+
+    // ═══ Config Consistency Tests ═══
+    section('Config Consistency');
+    assertEq(CONFIG.TICK_INTERVAL_MS, 1000, 'T-CFG-001', 'Tick interval 1s');
+    assertEq(CONFIG.CARE_SAMPLE_INTERVAL_MS, 6000, 'T-CFG-002', 'Care sample interval 6s');
+    assertEq(CONFIG.ACTION_COOLDOWN_MS, 250, 'T-CFG-003', 'Action cooldown 250ms');
+    assertEq(CONFIG.SICK_RECOVERY_THRESHOLD, 20, 'T-CFG-004', 'Sick recovery threshold 20');
+    assertEq(CONFIG.EVOLUTION_MIN_ACTIVE_TIME, 60, 'T-CFG-005', 'Evolution time 60s');
+    assertEq(CONFIG.EVOLUTION_MIN_CARE_QUALITY, 50, 'T-CFG-006', 'Evolution quality 50');
+    assertEq(CONFIG.EVOLUTION_INVULNERABILITY_MS, 10000, 'T-CFG-007', 'Evolution invuln 10s');
+    assertEq(CONFIG.STAT_INITIAL, 80, 'T-CFG-008', 'Initial stats 80');
+    assertEq(CONFIG.STAT_MIN, 0, 'T-CFG-009', 'Stat min 0');
+    assertEq(CONFIG.STAT_MAX, 100, 'T-CFG-010', 'Stat max 100');
+    assertEq(CONFIG.SAVE_VERSION, 2, 'T-CFG-011', 'Save version 2');
+    assertEq(CONFIG.OFFLINE_DECAY_CAP, 100, 'T-CFG-012', 'Offline decay cap 100');
+
+    // Feed effects
+    assertEq(CONFIG.ACTIONS.feed.hunger, 20, 'T-CFG-013', 'Feed hunger +20');
+    assertEq(CONFIG.ACTIONS.feed.happiness, 5, 'T-CFG-014', 'Feed happiness +5');
+    assertEq(CONFIG.ACTIONS.feed.energy, 0, 'T-CFG-015', 'Feed energy +0');
+    // Play effects
+    assertEq(CONFIG.ACTIONS.play.hunger, -5, 'T-CFG-016', 'Play hunger -5');
+    assertEq(CONFIG.ACTIONS.play.happiness, 20, 'T-CFG-017', 'Play happiness +20');
+    assertEq(CONFIG.ACTIONS.play.energy, -10, 'T-CFG-018', 'Play energy -10');
+    // Rest effects
+    assertEq(CONFIG.ACTIONS.rest.hunger, 0, 'T-CFG-019', 'Rest hunger +0');
+    assertEq(CONFIG.ACTIONS.rest.happiness, -5, 'T-CFG-020', 'Rest happiness -5');
+    assertEq(CONFIG.ACTIONS.rest.energy, 25, 'T-CFG-021', 'Rest energy +25');
+
+    // ═══ State constants validation ═══
+    section('State Constants');
+    assertEq(STATES.NORMAL, 'normal', 'T-SC-001', 'NORMAL = normal');
+    assertEq(STATES.SICK, 'sick', 'T-SC-002', 'SICK = sick');
+    assertEq(STATES.EVOLVED, 'evolved', 'T-SC-003', 'EVOLVED = evolved');
+    assert(Object.keys(STATES).length === 3, 'T-SC-004', 'Exactly 3 state constants');
+
+    // ═══ Summary ═══
+    const summaryClass = failed === 0 ? 'allpass' : 'hasfail';
+    output += `\n<div class="summary ${summaryClass}">`;
+    output += `Results: ${passed} passed, ${failed} failed\n`;
+    if (failed === 0) output += '🎉 ALL TESTS PASSED! 🎉';
+    output += `</div>`;
+
+    resultsEl.innerHTML = output;
+    document.title = failed === 0
+      ? `✅ ALL ${passed} TESTS PASSED — ChuChu`
+      : `❌ ${failed} FAILED — ChuChu Tests`;
+  </script>
+</body>
+</html>
