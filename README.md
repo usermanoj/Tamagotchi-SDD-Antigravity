@@ -1,8 +1,12 @@
 # 🐶 ChuChu — The Tiny Virtual Puppy
 
-![ChuChu Banner](page@112cfbc8ec22a2e75951572bc54f173f.webm)
+<video src="chuchu-demo.webm" width="100%" controls autoplay muted loop>
+  Your browser does not support the video tag. You can <a href="chuchu-demo.webm">download the demo video here</a>.
+</video>
 
 **ChuChu** is a feature-rich, hyper-speed virtual pet simulator built with vanilla JavaScript and CSS. Experience the nostalgic joy of a Tamagotchi-style pet with modern "Personal Touches," dynamic state transitions, and a 100% automated test suite.
+
+## 🚀 [Play Live Demo Now!](https://usermanoj.github.io/Tamagotchi-SDD-Antigravity/)
 
 ---
 

@@ -83,7 +83,7 @@
 
 ## Part 2: Complete User Manual
 
-![ChuChu Baby ChuChu — Final Demo](page@112cfbc8ec22a2e75951572bc54f173f.webm)
+![ChuChu Final Demo](chuchu-demo.webm)
 
 ### 🎮 What is ChuChu?
 
