@@ -84,4 +84,4 @@ We maintain 100% spec-to-code fidelity. To run the tests:
 
 ---
 
-*ChuChu was designed for the Antigravity Coding Challenge. 🐕✨*
+*ChuChu was designed for the Spec-Driven-Development challenge from DeepLearning.AI*
