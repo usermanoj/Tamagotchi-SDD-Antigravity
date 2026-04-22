@@ -1,0 +1,1066 @@
+/* ═══════════════════════════════════════════════════
+   ChuChu — Tiny Tamagotchi MVP
+   Modern Cartoon Theme — Premium Design System
+   ═══════════════════════════════════════════════════ */
+
+/* ─── Custom Properties ─── */
+:root {
+  /* Core palette */
+  --color-bg: #FEF5E7;
+  --color-bg-gradient: linear-gradient(135deg, #FEF5E7 0%, #FDE8D0 50%, #FCE4EC 100%);
+  --color-surface: #FFFFFF;
+  --color-surface-glass: rgba(255, 255, 255, 0.7);
+  --color-text: #2D2D2D;
+  --color-text-muted: #9E9E9E;
+  --color-accent: #FF6B9D;
+  --color-accent-hover: #FF4081;
+  --color-accent-glow: rgba(255, 107, 157, 0.35);
+
+  /* Stat bar colors */
+  --color-stat-high: #66BB6A;
+  --color-stat-mid: #FFA726;
+  --color-stat-low: #EF5350;
+
+  /* State colors */
+  --color-state-normal: #81C784;
+  --color-state-sick: #E57373;
+  --color-state-evolved: #FFD54F;
+
+  /* Pet colors */
+  --puppy-body: #F5C77E;
+  --puppy-body-dark: #D4A256;
+  --puppy-belly: #FFF3E0;
+  --puppy-ear: #D4A256;
+  --puppy-nose: #4E342E;
+  --puppy-eye: #3E2723;
+  --puppy-blush: #FFAB91;
+  --puppy-mouth: #795548;
+  --puppy-paw: #E8B96A;
+
+  /* Shadows */
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --shadow-button: 0 4px 16px rgba(255, 107, 157, 0.3);
+  --shadow-button-hover: 0 6px 24px rgba(255, 107, 157, 0.45);
+  --shadow-pet: 0 20px 60px rgba(0, 0, 0, 0.1);
+
+  /* Borders */
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 28px;
+  --radius-full: 9999px;
+
+  /* Typography */
+  --font-primary: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Baloo 2', 'Nunito', cursive;
+
+  /* Animation */
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+  --transition-slow: 600ms ease;
+  --bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ─── Reset & Base ─── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-primary);
+  background: var(--color-bg-gradient);
+  color: var(--color-text);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px 16px;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ─── App Container ─── */
+#app {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Header ─── */
+#header {
+  text-align: center;
+  padding: 8px 0;
+}
+
+#pet-name {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #FF6B9D, #FF8A65, #FFB74D);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  text-shadow: none;
+}
+
+.badges {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.stage-badge {
+  font-family: var(--font-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.state-badge {
+  font-family: var(--font-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all var(--transition-normal);
+}
+
+.state-badge-normal { background: var(--color-state-normal); color: #1B5E20; }
+.state-badge-sick { background: var(--color-state-sick); color: #B71C1C; animation: pulse 1.5s ease infinite; }
+.state-badge-evolved { background: var(--color-state-evolved); color: #F57F17; animation: glow 1s ease infinite; }
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+/* ─── Pet Area ─── */
+#pet-area {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.pet-container {
+  position: relative;
+  width: 220px;
+  height: 240px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-slow);
+}
+
+/* ─── CSS Puppy Art ─── */
+.pet-sprite {
+  position: relative;
+  width: 180px;
+  height: 200px;
+  cursor: pointer;
+  filter: drop-shadow(0 12px 24px rgba(0,0,0,0.12));
+  transition: filter var(--transition-normal);
+}
+
+.puppy-body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  animation: breathe 3s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.02) translateY(-2px); }
+}
+
+.puppy-head {
+  position: absolute;
+  top: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 110px;
+  background: var(--puppy-body);
+  border-radius: 50% 50% 45% 45%;
+  z-index: 2;
+  box-shadow: inset 0 -8px 16px rgba(0,0,0,0.06);
+}
+
+.puppy-ear {
+  position: absolute;
+  width: 45px;
+  height: 55px;
+  background: var(--puppy-ear);
+  border-radius: 50% 50% 30% 50%;
+  z-index: 1;
+  top: 12%;
+  box-shadow: inset 0 -4px 8px rgba(0,0,0,0.08);
+}
+
+.puppy-ear-left {
+  left: 12%;
+  transform: rotate(-20deg);
+  transform-origin: top right;
+  animation: earWiggle 4s ease-in-out infinite;
+}
+
+.puppy-ear-right {
+  right: 12%;
+  transform: rotate(20deg);
+  border-radius: 50% 50% 50% 30%;
+  transform-origin: top left;
+  animation: earWiggle 4s ease-in-out infinite 0.5s;
+}
+
+@keyframes earWiggle {
+  0%, 100% { transform: rotate(-20deg); }
+  25% { transform: rotate(-15deg); }
+  75% { transform: rotate(-25deg); }
+}
+
+.puppy-ear-right {
+  animation-name: earWiggleRight;
+}
+
+@keyframes earWiggleRight {
+  0%, 100% { transform: rotate(20deg); }
+  25% { transform: rotate(15deg); }
+  75% { transform: rotate(25deg); }
+}
+
+.puppy-eye {
+  position: absolute;
+  width: 26px;
+  height: 28px;
+  background: white;
+  border-radius: 50%;
+  top: 32%;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+.puppy-eye-left { left: 22%; }
+.puppy-eye-right { right: 22%; }
+
+.puppy-pupil {
+  position: absolute;
+  width: 16px;
+  height: 18px;
+  background: var(--puppy-eye);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: lookAround 6s ease-in-out infinite;
+}
+
+.puppy-pupil::after {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+  top: 3px;
+  right: 2px;
+}
+
+@keyframes lookAround {
+  0%, 100% { transform: translate(-50%, -50%); }
+  15% { transform: translate(-35%, -55%); }
+  30% { transform: translate(-65%, -50%); }
+  50% { transform: translate(-50%, -45%); }
+  70% { transform: translate(-40%, -50%); }
+}
+
+.puppy-nose {
+  position: absolute;
+  width: 22px;
+  height: 16px;
+  background: var(--puppy-nose);
+  border-radius: 50% 50% 40% 40%;
+  top: 58%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+}
+
+.puppy-nose::after {
+  content: '';
+  position: absolute;
+  width: 5px;
+  height: 3px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 50%;
+  top: 3px;
+  left: 5px;
+}
+
+.puppy-mouth {
+  position: absolute;
+  width: 20px;
+  height: 10px;
+  border-bottom: 3px solid var(--puppy-mouth);
+  border-radius: 0 0 50% 50%;
+  top: 72%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.puppy-blush {
+  position: absolute;
+  width: 20px;
+  height: 12px;
+  background: var(--puppy-blush);
+  border-radius: 50%;
+  top: 62%;
+  opacity: 0.5;
+}
+
+.puppy-blush-left { left: 10%; }
+.puppy-blush-right { right: 10%; }
+
+.puppy-belly {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 70px;
+  background: var(--puppy-belly);
+  border-radius: 50% 50% 45% 45%;
+  z-index: 1;
+  box-shadow: inset 0 -4px 12px rgba(0,0,0,0.04);
+}
+
+.puppy-paw {
+  position: absolute;
+  bottom: 4%;
+  width: 32px;
+  height: 22px;
+  background: var(--puppy-paw);
+  border-radius: 50% 50% 40% 40%;
+  z-index: 3;
+}
+
+.puppy-paw-left { left: 22%; }
+.puppy-paw-right { right: 22%; }
+
+.puppy-paw::before {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 8px;
+  background: var(--puppy-belly);
+  border-radius: 50%;
+}
+
+.puppy-tail {
+  position: absolute;
+  right: 5%;
+  bottom: 22%;
+  width: 12px;
+  height: 35px;
+  background: var(--puppy-body-dark);
+  border-radius: 50% 50% 50% 30%;
+  transform-origin: bottom center;
+  animation: tailWag 0.6s ease-in-out infinite;
+  z-index: 0;
+}
+
+@keyframes tailWag {
+  0%, 100% { transform: rotate(-15deg); }
+  50% { transform: rotate(15deg); }
+}
+
+/* ─── Evolved Stage ─── */
+/* 1 evolution: Baby ChuChu → Evolved Puppy (radiant, larger, sparkly) */
+.stage-evolved {
+  --puppy-body: #FFD54F;
+  --puppy-body-dark: #F9A825;
+  --puppy-belly: #FFF9C4;
+  --puppy-ear: #F9A825;
+  --puppy-blush: #FF8A80;
+  --puppy-paw: #FFE082;
+}
+
+.stage-evolved .puppy-head {
+  width: 125px;
+  height: 115px;
+  box-shadow: inset 0 -8px 16px rgba(0,0,0,0.06), 0 0 30px rgba(255,213,79,0.3);
+}
+
+.stage-evolved .puppy-ear {
+  height: 60px;
+}
+
+.stage-evolved .puppy-belly {
+  width: 95px;
+  height: 75px;
+}
+
+.stage-evolved .puppy-paw {
+  width: 36px;
+  height: 24px;
+}
+
+.stage-evolved .puppy-tail {
+  height: 42px;
+}
+
+.stage-evolved .puppy-eye .puppy-pupil::before {
+  content: '♥';
+  position: absolute;
+  font-size: 6px;
+  top: -1px;
+  left: 1px;
+  color: #E91E63;
+}
+
+.stage-evolved .pet-sprite::after {
+  content: '✨';
+  position: absolute;
+  top: -5px;
+  right: 10px;
+  font-size: 20px;
+  animation: sparkleFloat 2s ease-in-out infinite;
+}
+
+@keyframes sparkleFloat {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 1; }
+  50% { transform: translateY(-8px) scale(1.2); opacity: 0.7; }
+}
+
+/* ─── State Overlays ─── */
+
+/* Sick state */
+.state-sick .pet-sprite {
+  filter: hue-rotate(60deg) saturate(0.6) brightness(0.9)
+    drop-shadow(0 12px 24px rgba(0,0,0,0.12));
+}
+
+.state-sick .puppy-body {
+  animation: sickWobble 2s ease-in-out infinite;
+}
+
+@keyframes sickWobble {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(0.98) rotate(-1deg); }
+  75% { transform: scale(0.98) rotate(1deg); }
+}
+
+.sick-overlay {
+  display: none;
+  position: absolute;
+  top: -20px;
+  right: 15%;
+  font-size: 28px;
+  animation: sickBounce 2s ease-in-out infinite;
+  z-index: 10;
+}
+
+.state-sick .sick-overlay { display: block; }
+
+@keyframes sickBounce {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  50% { transform: translateY(-5px) rotate(5deg); }
+}
+
+/* (Sleeping state removed — not in challenge scope) */
+
+/* Evolved state */
+.state-evolved .pet-sprite {
+  filter: brightness(1.15) saturate(1.3)
+    drop-shadow(0 0 30px rgba(255,213,79,0.5))
+    drop-shadow(0 12px 24px rgba(0,0,0,0.12));
+}
+
+.state-evolved .puppy-body {
+  animation: evolveGlow 1.5s ease-in-out infinite;
+}
+
+@keyframes evolveGlow {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+.evolving .pet-sprite {
+  animation: evolveTransform 10s ease-in-out forwards;
+}
+
+@keyframes evolveTransform {
+  0% { transform: scale(1); }
+  10% { transform: scale(0.95); }
+  30% { transform: scale(1.15); filter: brightness(2); }
+  50% { transform: scale(1.1); filter: brightness(1.5); }
+  80% { transform: scale(1.05); filter: brightness(1.1); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+
+/* ─── Party Hat (Weekend Easter Egg) ─── */
+.party-hat {
+  display: none;
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-bottom: 28px solid #E91E63;
+  z-index: 20;
+}
+
+.party-hat::after {
+  content: '🎉';
+  position: absolute;
+  top: -18px;
+  left: -5px;
+  font-size: 12px;
+}
+
+.weekend-party .party-hat { display: block; }
+
+/* ─── Easter Egg: Sneeze ─── */
+.sneeze .puppy-head {
+  animation: sneezeHead 0.5s ease-out;
+}
+
+@keyframes sneezeHead {
+  0% { transform: translateX(-50%) translateY(0); }
+  30% { transform: translateX(-50%) translateY(-8px); }
+  60% { transform: translateX(-50%) translateY(4px); }
+  100% { transform: translateX(-50%) translateY(0); }
+}
+
+.sneeze-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+  top: 55%;
+  left: 50%;
+  opacity: 0;
+  z-index: 15;
+  animation: particleBurst 0.6s ease-out forwards;
+  animation-delay: var(--delay);
+}
+
+@keyframes particleBurst {
+  0% { opacity: 1; transform: translate(0, 0) scale(1); }
+  100% {
+    opacity: 0;
+    transform: translate(
+      calc(cos(var(--angle)) * 50px),
+      calc(sin(var(--angle)) * 50px)
+    ) scale(0.3);
+  }
+}
+
+/* ─── Easter Egg: Dizzy ─── */
+.dizzy .puppy-pupil {
+  animation: dizzyEyes 0.5s linear infinite;
+}
+
+@keyframes dizzyEyes {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.dizzy .puppy-body {
+  animation: dizzyWobble 0.3s ease-in-out infinite;
+}
+
+@keyframes dizzyWobble {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+/* ─── Easter Egg: Dance ─── */
+.dancing .puppy-body {
+  animation: danceMove 0.5s ease-in-out infinite;
+}
+
+@keyframes danceMove {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  25% { transform: translateX(-8px) rotate(-5deg); }
+  75% { transform: translateX(8px) rotate(5deg); }
+}
+
+.dancing .puppy-tail {
+  animation: tailWag 0.2s ease-in-out infinite;
+}
+
+.music-note {
+  position: absolute;
+  font-size: 20px;
+  bottom: 30%;
+  opacity: 0;
+  animation: noteFloat 2.5s ease-out forwards;
+  animation-delay: var(--delay);
+  z-index: 15;
+  pointer-events: none;
+}
+
+@keyframes noteFloat {
+  0% { opacity: 0; transform: translateY(0) scale(0.5); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-80px) scale(1.2) rotate(15deg); }
+}
+
+/* ─── Easter Egg: Konami Rainbow ─── */
+.konami-rainbow .pet-sprite {
+  animation: rainbowHue 2s linear infinite;
+}
+
+@keyframes rainbowHue {
+  from { filter: hue-rotate(0deg) brightness(1.1) drop-shadow(0 0 20px rgba(255,107,157,0.5)); }
+  to { filter: hue-rotate(360deg) brightness(1.1) drop-shadow(0 0 20px rgba(107,157,255,0.5)); }
+}
+
+.konami-flash {
+  position: fixed;
+  inset: 0;
+  background: white;
+  z-index: 9999;
+  animation: flashFade 0.5s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes flashFade {
+  from { opacity: 0.8; }
+  to { opacity: 0; }
+}
+
+/* ─── Action Animations ─── */
+.anim-feed .puppy-mouth {
+  height: 14px;
+  border-radius: 0 0 50% 50%;
+  border-bottom-width: 0;
+  background: var(--puppy-mouth);
+}
+
+.anim-feed .puppy-tail {
+  animation: tailWag 0.2s ease-in-out infinite;
+}
+
+.anim-feed .puppy-body {
+  animation: feedBounce 1.5s ease;
+}
+
+@keyframes feedBounce {
+  0%, 100% { transform: scale(1); }
+  20% { transform: scale(1.05); }
+  40% { transform: scale(0.98); }
+  60% { transform: scale(1.03); }
+}
+
+.anim-play .puppy-body {
+  animation: playJump 0.4s ease infinite;
+}
+
+@keyframes playJump {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+
+.anim-play .puppy-tail {
+  animation: tailWag 0.15s ease-in-out infinite;
+}
+
+.anim-rest .puppy-body {
+  animation: restCurl 1.5s ease-in-out;
+}
+
+@keyframes restCurl {
+  0% { transform: scale(1); }
+  40% { transform: scale(0.92) translateY(8px); }
+  100% { transform: scale(1); }
+}
+
+.anim-rest .puppy-eye {
+  height: 6px;
+  top: 42%;
+  transition: height 0.3s ease;
+}
+
+/* ─── Stats Area ─── */
+#stats-area {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  padding: 20px 24px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.stat-bar {
+  display: grid;
+  grid-template-columns: 110px 1fr 36px;
+  align-items: center;
+  gap: 10px;
+  transition: background-color 0.3s ease;
+  padding: 4px 0;
+  border-radius: var(--radius-sm);
+}
+
+.stat-bar label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.bar-track {
+  height: 14px;
+  background: #F0F0F0;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--color-stat-high);
+  transition: width 150ms ease, background-color 150ms ease;
+  position: relative;
+}
+
+.bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  right: 4px;
+  height: 4px;
+  background: rgba(255,255,255,0.35);
+  border-radius: var(--radius-full);
+}
+
+.bar-value {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--color-text-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Flash effects */
+.flash-positive { background-color: rgba(102, 187, 106, 0.15) !important; }
+.flash-negative { background-color: rgba(239, 83, 80, 0.15) !important; }
+
+/* ─── Actions Area ─── */
+#actions-area {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.action-btn {
+  flex: 1;
+  max-width: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 12px;
+  background: linear-gradient(135deg, var(--color-accent) 0%, #FF8A65 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-family: var(--font-primary);
+  font-weight: 700;
+  font-size: 0.85rem;
+  box-shadow: var(--shadow-button);
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.action-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-button-hover);
+  background: linear-gradient(135deg, var(--color-accent-hover) 0%, #FF7043 100%);
+}
+
+.action-btn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.97);
+}
+
+.action-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.btn-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.3px;
+}
+
+/* Cooldown ring */
+.cooldown-ring {
+  position: absolute;
+  inset: 2px;
+  border-radius: var(--radius-md);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.cooldown-ring svg {
+  width: 100%;
+  height: 100%;
+}
+
+.cooldown-ring circle {
+  fill: none;
+  stroke: rgba(255,255,255,0.5);
+  stroke-width: 2;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 0;
+  transform: rotate(-90deg);
+  transform-origin: center;
+}
+
+.cooldown-ring.active {
+  opacity: 1;
+}
+
+.cooldown-ring.active circle {
+  animation: cooldownSweep 0.25s linear forwards;
+}
+
+@keyframes cooldownSweep {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: 100; }
+}
+
+.on-cooldown {
+  background: linear-gradient(135deg, #BDBDBD 0%, #9E9E9E 100%) !important;
+  box-shadow: none !important;
+}
+
+.cooldown-pop {
+  animation: popIn 0.2s var(--bounce);
+}
+
+@keyframes popIn {
+  from { transform: scale(0.9); }
+  to { transform: scale(1); }
+}
+
+/* ─── Dialogue Bubble ─── */
+.dialogue-bubble {
+  position: absolute;
+  bottom: 82%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  white-space: normal;
+  max-width: 200px;
+  text-align: center;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.dialogue-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid var(--color-surface);
+}
+
+.dialogue-bubble.hidden { display: none; }
+
+.dialogue-bubble.fade-in {
+  animation: bubbleFadeIn 0.3s ease-out;
+}
+
+.dialogue-bubble.fade-out {
+  animation: bubbleFadeOut 0.3s ease-in forwards;
+}
+
+@keyframes bubbleFadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px) scale(0.9); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+
+@keyframes bubbleFadeOut {
+  from { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+  to { opacity: 0; transform: translateX(-50%) translateY(8px) scale(0.9); }
+}
+
+/* ─── Footer ─── */
+#footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+#btn-reset {
+  background: none;
+  border: 1.5px solid #E0E0E0;
+  padding: 5px 14px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+#btn-reset:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* ─── Reset Modal ─── */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal.hidden { display: none; }
+
+.modal-content {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  padding: 32px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  max-width: 340px;
+  animation: modalIn 0.3s var(--bounce);
+}
+
+@keyframes modalIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-content p {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.modal-btn-danger {
+  padding: 10px 24px;
+  background: var(--color-stat-low);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-primary);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.modal-btn-danger:hover { background: #D32F2F; }
+
+.modal-btn-cancel {
+  padding: 10px 24px;
+  background: #F5F5F5;
+  color: var(--color-text);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-primary);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.modal-btn-cancel:hover { background: #EEEEEE; }
+
+/* ─── Glow animation ─── */
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(255, 213, 79, 0.4); }
+  50% { box-shadow: 0 0 16px rgba(255, 213, 79, 0.7); }
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 400px) {
+  #pet-name { font-size: 2rem; }
+  .pet-sprite { width: 150px; height: 170px; }
+  .puppy-head { width: 100px; height: 92px; }
+  .puppy-ear { width: 38px; height: 46px; }
+  .puppy-belly { width: 75px; height: 58px; }
+  .action-btn { padding: 12px 10px; }
+  .btn-icon { font-size: 1.5rem; }
+  .stat-bar { grid-template-columns: 90px 1fr 32px; }
+}
+
+@media (min-width: 768px) {
+  body { align-items: center; }
+  #app { gap: 24px; }
+  .pet-container { width: 260px; height: 280px; }
+  .pet-sprite { width: 200px; height: 220px; }
+}

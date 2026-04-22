@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ChuChu — Test Runner</title>
+  <style>
+    body { font-family: monospace; background: #1e1e1e; color: #d4d4d4; padding: 20px; }
+    h1 { color: #FFD54F; }
+    .pass { color: #4CAF50; }
+    .fail { color: #F44336; }
+    .section { color: #81C784; font-weight: bold; margin-top: 16px; }
+    #results { white-space: pre-wrap; line-height: 1.6; }
+    .summary { font-size: 18px; margin-top: 20px; padding: 12px; border-radius: 8px; }
+    .summary.allpass { background: #1B5E20; color: #A5D6A7; }
+    .summary.hasfail { background: #B71C1C; color: #EF9A9A; }
+  </style>
+</head>
+<body>
+  <h1>🧪 ChuChu Tamagotchi — Test Suite</h1>
+  <p>Automated tests validating spec-to-code fidelity.</p>
+  <div id="results">Loading tests...</div>
+
+  <!-- Load app modules and test suite -->
+  <script type="module">
+    import { CONFIG } from '/src/config.js';
+    import { GameLoop } from '/src/engine/game-loop.js';
+    import { runAllTests, setTestLogger } from '/tests/test-suite.js';
+
+    // Make CONFIG available globally for the test suite
+    window.__CONFIG = CONFIG;
+    
+    // Boot the engine, but immediately stop the automatic ticks so we can run stateless tests safely
+    const game = new GameLoop();
+    game.stop();
+    
+    // GameLoop constructor already sets window.__gameLoop and window.__evolutionTracker
+
+    const resultsEl = document.getElementById('results');
+    let output = '';
+
+    function log(text, cls = '') {
+      output += cls ? `<span class="${cls}">${text}</span>\n` : `${text}\n`;
+    }
+
+    setTestLogger({
+      pass: (testId, desc) => log(`  ✅ ${testId}: ${desc}`, 'pass'),
+      fail: (testId, desc) => log(`  ❌ ${testId}: ${desc}`, 'fail'),
+      section: (name) => log(`\n━━━ ${name} ━━━`, 'section')
+    });
+
+    const result = runAllTests();
+
+    const summaryClass = result.failed === 0 ? 'allpass' : 'hasfail';
+    output += `\n<div class="summary ${summaryClass}">`;
+    output += `Results: ${result.passed} passed, ${result.failed} failed\n`;
+    if (result.failed === 0) output += '🎉 ALL TESTS PASSED! 🎉';
+    output += `</div>`;
+
+    resultsEl.innerHTML = output;
+    document.title = result.failed === 0
+      ? `✅ ALL ${result.passed} TESTS PASSED — ChuChu`
+      : `❌ ${result.failed} FAILED — ChuChu Tests`;
+  </script>
+</body>
+</html>

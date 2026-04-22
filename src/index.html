@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ChuChu — A tiny virtual puppy pet you can feed, play with, and watch evolve!">
+  <title>ChuChu — Tiny Tamagotchi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main id="app">
+    <header id="header">
+      <h1 id="pet-name">ChuChu</h1>
+      <div class="badges">
+        <span id="stage-badge" class="stage-badge">🐶 Baby ChuChu</span>
+        <span id="state-badge" class="state-badge state-badge-normal">Normal</span>
+      </div>
+    </header>
+
+    <section id="pet-area">
+      <div id="pet-container" class="pet-container stage-baby state-normal">
+        <!-- ChuChu is rendered with CSS art + emoji — no external image dependency -->
+        <div id="pet-sprite" class="pet-sprite" role="img" aria-label="ChuChu the puppy">
+          <div class="puppy-body">
+            <div class="puppy-ear puppy-ear-left"></div>
+            <div class="puppy-ear puppy-ear-right"></div>
+            <div class="puppy-head">
+              <div class="puppy-eye puppy-eye-left">
+                <div class="puppy-pupil"></div>
+              </div>
+              <div class="puppy-eye puppy-eye-right">
+                <div class="puppy-pupil"></div>
+              </div>
+              <div class="puppy-nose"></div>
+              <div class="puppy-mouth"></div>
+              <div class="puppy-blush puppy-blush-left"></div>
+              <div class="puppy-blush puppy-blush-right"></div>
+            </div>
+            <div class="puppy-belly"></div>
+            <div class="puppy-paw puppy-paw-left"></div>
+            <div class="puppy-paw puppy-paw-right"></div>
+            <div class="puppy-tail"></div>
+          </div>
+          <!-- State overlays -->
+          <div class="sick-overlay">🌡️</div>
+          <div class="party-hat"></div>
+        </div>
+        <div id="pet-overlay" class="pet-overlay"></div>
+        <div id="dialogue-bubble" class="dialogue-bubble hidden" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section id="stats-area">
+      <div class="stat-bar" id="stat-hunger">
+        <label>🍖 Hunger</label>
+        <div class="bar-track"><div class="bar-fill" id="hunger-fill"></div></div>
+        <span class="bar-value" id="hunger-value">80</span>
+      </div>
+      <div class="stat-bar" id="stat-happiness">
+        <label>😊 Happiness</label>
+        <div class="bar-track"><div class="bar-fill" id="happiness-fill"></div></div>
+        <span class="bar-value" id="happiness-value">80</span>
+      </div>
+      <div class="stat-bar" id="stat-energy">
+        <label>⚡ Energy</label>
+        <div class="bar-track"><div class="bar-fill" id="energy-fill"></div></div>
+        <span class="bar-value" id="energy-value">80</span>
+      </div>
+    </section>
+
+    <section id="actions-area">
+      <button id="btn-feed" class="action-btn" aria-label="Feed ChuChu">
+        <span class="btn-icon">🍖</span>
+        <span class="btn-label">Feed</span>
+        <div class="cooldown-ring"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="16"/></svg></div>
+      </button>
+      <button id="btn-play" class="action-btn" aria-label="Play with ChuChu">
+        <span class="btn-icon">🎾</span>
+        <span class="btn-label">Play</span>
+        <div class="cooldown-ring"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="16"/></svg></div>
+      </button>
+      <button id="btn-rest" class="action-btn" aria-label="Let ChuChu rest">
+        <span class="btn-icon">💤</span>
+        <span class="btn-label">Rest</span>
+        <div class="cooldown-ring"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="16"/></svg></div>
+      </button>
+    </section>
+
+    <footer id="footer">
+      <span id="active-time">Active: 0:00</span>
+      <span id="care-quality">Care: 80%</span>
+      <button id="btn-reset" aria-label="Reset pet">🔄 Reset</button>
+    </footer>
+  </main>
+
+  <div id="reset-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <p>Are you sure you want to reset ChuChu?<br>This cannot be undone! 😢</p>
+      <div class="modal-actions">
+        <button id="btn-confirm-reset" class="modal-btn-danger">Yes, Reset</button>
+        <button id="btn-cancel-reset" class="modal-btn-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+.env
+.antigravity/
+# Exclude the temporary recording script and large video files if preferred
+# chuchu_realistic_playthrough_final.webm
+# page@*.webm

@@ -1,0 +1,18 @@
+{
+  "name": "chuchu-tamagotchi",
+  "version": "1.0.0",
+  "description": "ChuChu — A tiny virtual puppy pet you can feed, play with, and watch evolve!",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^6.0.0"
+  },
+  "dependencies": {
+    "no": "^0.0.1",
+    "playwright": "^1.59.1"
+  }
+}
