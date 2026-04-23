@@ -83,7 +83,7 @@
 
 ## Part 2: Complete User Manual
 
-![ChuChu Final Demo](chuchu-demo.webm)
+![ChuChu Final Demo](https://usermanoj.github.io/Tamagotchi-SDD-Antigravity/chuchu-demo.webm)
 
 ### 🎮 What is ChuChu?
 

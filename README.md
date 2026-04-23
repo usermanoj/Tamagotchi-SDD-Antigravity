@@ -5,10 +5,10 @@
 ## 🚀 [Play Live Demo Now!](https://usermanoj.github.io/Tamagotchi-SDD-Antigravity/)
 
 ### 📺 Watch the Playthrough
-[![ChuChu Gameplay Demo](https://img.shields.io/badge/Watch-Gameplay_Demo-blue?style=for-the-badge&logo=youtube)](./chuchu-demo.webm)
+[![ChuChu Gameplay Demo](https://img.shields.io/badge/Watch-Gameplay_Demo-blue?style=for-the-badge&logo=youtube)](https://usermanoj.github.io/Tamagotchi-SDD-Antigravity/chuchu-demo.webm)
 
 > [!TIP]
-> If the preview above doesn't load, you can find the raw video file [here](./chuchu-demo.webm).
+> If the preview above doesn't load, you can watch the direct stream [here](https://usermanoj.github.io/Tamagotchi-SDD-Antigravity/chuchu-demo.webm).
 
 ---
 
